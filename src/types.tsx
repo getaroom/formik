@@ -114,6 +114,8 @@ export interface FormikActions<Values> {
   validateField(field: string): void;
   /** Reset form */
   resetForm(nextValues?: any): void;
+  /** Reinitialize form */
+  reinitializeForm(nextValues?: any): void;
   /** Submit the form imperatively */
   submitForm(): void;
   /** Set Formik state, careful! */
@@ -183,6 +185,8 @@ export interface FormikSharedConfig {
   isInitialValid?: boolean | ((props: object) => boolean | undefined);
   /** Should Formik reset the form when new initialValues change */
   enableReinitialize?: boolean;
+  /** Should Formik use reset or replace on reinitialize */
+  reinitializeVia?: string;
 }
 
 /**

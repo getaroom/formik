@@ -1023,6 +1023,28 @@ describe('<Formik>', () => {
       });
       expect(form.resetForm).not.toHaveBeenCalled();
     });
+
+    it('should use reinitializeVia to change from reset to replace', () => {
+      form = new Formik({
+        initialValues,
+        onSubmit: jest.fn(),
+        enableReinitialize: true,
+        reinitializeVia: 'replace',
+      });
+      form.resetForm = jest.fn();
+      form.reinitializeForm = jest.fn();
+
+      const newInitialValues = {
+        ...initialValues,
+        watchers: ['jared', 'ian', 'sam'],
+      };
+      form.componentDidUpdate({
+        initialValues: newInitialValues,
+        onSubmit: jest.fn(),
+      });
+      expect(form.resetForm).not.toHaveBeenCalled();
+      expect(form.reinitializeForm).toHaveBeenCalled();
+    });
   });
 
   describe('handleReset', () => {
@@ -1046,6 +1068,7 @@ describe('<Formik>', () => {
         { name: 'jared' },
         expect.objectContaining({
           resetForm: expect.any(Function),
+          reinitializeForm: expect.any(Function),
           setError: expect.any(Function),
           setErrors: expect.any(Function),
           setFieldError: expect.any(Function),

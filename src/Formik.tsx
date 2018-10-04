@@ -35,6 +35,7 @@ export class Formik<Values = object, ExtraProps = {}> extends React.Component<
     validateOnBlur: true,
     isInitialValid: false,
     enableReinitialize: false,
+    reinitializeVia: 'reset',
   };
 
   initialValues: Values;
@@ -66,6 +67,9 @@ export class Formik<Values = object, ExtraProps = {}> extends React.Component<
     this.didMount = false;
     this.fields = {};
     this.initialValues = props.initialValues || ({} as any);
+    this.reinitializeForm = this.reinitializeForm.bind(this);
+    this.resetForm = this.resetForm.bind(this);
+
     warning(
       !(props.component && props.render),
       'You should not use <Formik component> and <Formik render> in the same <Formik> component; <Formik render> will be ignored'
@@ -112,7 +116,12 @@ export class Formik<Values = object, ExtraProps = {}> extends React.Component<
     ) {
       this.initialValues = this.props.initialValues;
       // @todo refactor to use getDerivedStateFromProps?
-      this.resetForm(this.props.initialValues);
+      const reinitalization =
+        this.props.reinitializeVia === 'replace'
+          ? this.reinitializeForm
+          : this.resetForm;
+
+      reinitalization(this.props.initialValues);
     }
   }
 
@@ -581,12 +590,23 @@ export class Formik<Values = object, ExtraProps = {}> extends React.Component<
     }
   };
 
+  reinitializeForm(nextValues?: Values) {
+    const values = nextValues ? nextValues : this.props.initialValues;
+
+    this.initialValues = values;
+
+    this.setState((prevState: object) =>
+      Object.assign({}, prevState, { values })
+    );
+  }
+
   setFormikState = (s: any, callback?: (() => void)) =>
     this.setState(s, callback);
 
   getFormikActions = (): FormikActions<Values> => {
     return {
       resetForm: this.resetForm,
+      reinitializeForm: this.reinitializeForm,
       submitForm: this.submitForm,
       validateForm: this.runValidations,
       validateField: this.validateField,
