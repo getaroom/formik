@@ -20,6 +20,7 @@ import {
   isPromise,
   isString,
   setIn,
+  setAllIn,
   setNestedObjectValues,
   getActiveElement,
   getIn,
@@ -44,6 +45,9 @@ export class Formik<Values = object, ExtraProps = {}> extends React.Component<
   hbCache: {
     [key: string]: (e: any) => void;
   } = {};
+  hfCache: {
+    [key: string]: (e: any) => void;
+  } = {};
   fields: {
     [field: string]: React.Component<any>;
   };
@@ -53,6 +57,7 @@ export class Formik<Values = object, ExtraProps = {}> extends React.Component<
     this.state = {
       values: props.initialValues || ({} as any),
       errors: {},
+      focused: {},
       touched: {},
       isSubmitting: false,
       isValidating: false,
@@ -454,6 +459,7 @@ export class Formik<Values = object, ExtraProps = {}> extends React.Component<
 
       this.setState(prevState => ({
         touched: setIn(prevState.touched, field, true),
+        focused: setIn(prevState.focused, field, false),
       }));
 
       if (this.props.validateOnBlur) {
@@ -499,6 +505,47 @@ export class Formik<Values = object, ExtraProps = {}> extends React.Component<
     }));
   };
 
+  setFieldFocused = (field: string, focused: boolean = false) => {
+    this.setState(prevState => ({
+      ...prevState,
+      focused: setIn(setAllIn(prevState.focused, false), field, focused),
+    }));
+  };
+
+  handleFocus = (eventOrString: any): void | ((e: any) => void) => {
+    const executeFocus = (e: any, path?: string) => {
+      if (e.persist) {
+        e.persist();
+      }
+      const { name, id, outerHTML } = e.target;
+      const field = path ? path : name ? name : id;
+
+      if (!field && process.env.NODE_ENV !== 'production') {
+        warnAboutMissingIdentifier({
+          htmlContent: outerHTML,
+          documentationAnchorLink: 'handlefocus-e-any--void',
+          handlerName: 'handleFocus',
+        });
+      }
+
+      this.setState(prevState => {
+        return {
+          focused: setIn(setAllIn(prevState.focused, false), field, true),
+        };
+      });
+    };
+
+    if (isString(eventOrString)) {
+      // cache these handlers by key like Preact's linkState does for perf boost
+      return isFunction(this.hfCache[eventOrString])
+        ? this.hfCache[eventOrString]
+        : (this.hfCache[eventOrString] = (event: any) =>
+            executeFocus(event, eventOrString));
+    } else {
+      executeFocus(eventOrString);
+    }
+  };
+
   resetForm = (nextValues?: Values) => {
     const values = nextValues ? nextValues : this.props.initialValues;
 
@@ -509,6 +556,7 @@ export class Formik<Values = object, ExtraProps = {}> extends React.Component<
       isValidating: false,
       errors: {},
       touched: {},
+      focused: {},
       error: undefined,
       status: undefined,
       values,
@@ -545,6 +593,7 @@ export class Formik<Values = object, ExtraProps = {}> extends React.Component<
       setError: this.setError,
       setErrors: this.setErrors,
       setFieldError: this.setFieldError,
+      setFieldFocused: this.setFieldFocused,
       setFieldTouched: this.setFieldTouched,
       setFieldValue: this.setFieldValue,
       setStatus: this.setStatus,
@@ -579,6 +628,7 @@ export class Formik<Values = object, ExtraProps = {}> extends React.Component<
       unregisterField: this.unregisterField,
       handleBlur: this.handleBlur,
       handleChange: this.handleChange,
+      handleFocus: this.handleFocus,
       handleReset: this.handleReset,
       handleSubmit: this.handleSubmit,
       validateOnChange: this.props.validateOnChange,
