@@ -38,7 +38,8 @@
     "start-website": "cd website && yarn start",
     "build-website": "cd website && yarn install && yarn build",
     "gen-docs": "all-contributors generate && doctoc README.md",
-    "size": "size-limit"
+    "size": "size-limit",
+    "prepare": "npm run build"
   },
   "dependencies": {
     "create-react-context": "^0.2.2",
