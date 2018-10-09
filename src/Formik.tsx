@@ -284,7 +284,12 @@ export class Formik<Values = object, ExtraProps = {}> extends React.Component<
       );
 
       if (this.didMount) {
-        this.setState({ isValidating: false, errors: combinedErrors });
+        this.setState(prevState =>
+          Object.assign({}, prevState, {
+            isValidating: false,
+            errors: Object.assign({}, prevState.errors, combinedErrors),
+          })
+        );
       }
 
       return combinedErrors;
