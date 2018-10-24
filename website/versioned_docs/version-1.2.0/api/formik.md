@@ -1,6 +1,7 @@
 ---
 id: version-1.2.0-formik
 title: <Formik />
+custom_edit_url: https://github.com/jaredpalmer/formik/edit/master/docs/api/formik.md
 original_id: formik
 ---
 
@@ -173,7 +174,7 @@ A top-level status object that you can use to represent form state that can't
 otherwise be expressed/stored with other methods. This is useful for capturing
 and passing through API responses to your inner component.
 
-`status` should only be modifed by calling
+`status` should only be modified by calling
 [`setStatus`](#setstatus-status-any-void).
 
 #### `touched: { [field: string]: boolean }`
@@ -325,7 +326,7 @@ Validate the form's `values` with function. This function can either be:
 
 ```js
 // Synchronous validation
-const validate = (values, props) => {
+const validate = (values) => {
   let errors = {};
 
   if (!values.email) {
@@ -346,7 +347,7 @@ const validate = (values, props) => {
 // Async Validation
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-const validate = (values, props) => {
+const validate = (values) => {
   return sleep(2000).then(() => {
     let errors = {};
     if (['admin', 'null', 'god'].includes(values.username)) {

@@ -29,7 +29,7 @@ user API has nested objects like so.
 ```
 
 ```jsx
-// User.js
+// EditUserDialog.js
 import React from 'react';
 import Dialog from 'MyImaginaryDialogComponent'; // this isn't a real package, just imagine it exists.
 import { Formik } from 'formik';
@@ -168,7 +168,7 @@ This is better, but that all those `errors` and `touched` logic is still quite r
 // EditUserDialog.js
 import React from 'react';
 import Dialog from 'MySuperDialog';
-import { Formik, Field, Form } from 'formik';
+import { Formik, Field, Form, ErrorMessage } from 'formik';
 
 const EditUserDialog = ({ user, updateUser, onClose }) => {
   return (
@@ -199,7 +199,7 @@ const EditUserDialog = ({ user, updateUser, onClose }) => {
               {errorMessage => <div className="error">{errorMessage}</div>}
             </ErrorMessage>
             <Field type="text" name="social.twitter" />
-            <ErrorMessage name="social.twitter" className="error" component="div">  
+            <ErrorMessage name="social.twitter" className="error" component="div"/>  
             {status && status.msg && <div>{status.msg}</div>}
             <button type="submit" disabled={isSubmitting}>
               Submit
